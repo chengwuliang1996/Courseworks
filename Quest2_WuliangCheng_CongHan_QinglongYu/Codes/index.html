@@ -1,0 +1,141 @@
+<!-- client side -->
+
+<!doctype html>
+<html>
+
+<!-- HTML HEAD -->
+<head>
+	<title>Line Chart</title>
+	<!-- Source for Canvas JS - points to the web - needs internet -->
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<!-- Source for Socket.io - this one is local -->
+	<script src="/socket.io/socket.io.js"></script>
+
+	<style>
+  	canvas{
+  		-moz-user-select: none;
+  		-webkit-user-select: none;
+  		-ms-user-select: none;
+  	}
+	</style>
+</head>
+
+<body>
+	<!-- HTML layout -->
+  <h1>Quest2</h1> <br>
+	<div id="message_disp"></div>
+	<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+
+	<!-- Script to handle charting -->
+	<script>
+		var d_0 = [];
+		var d_1 = [];
+		var d_2 = [];
+		var d_3 = [];
+		var chart = new CanvasJS.Chart("chartContainer", {
+			exportEnabled: true,
+			title :{
+				text: "Dynamic Line Chart"
+			},
+			axisY: {
+				includeZero: false
+			},
+			data: [{
+				type: "line",
+				markerSize: 0,
+				dataPoints: d_0
+			},
+			{
+				markerSize: 0,
+				type: "line",
+				dataPoints: d_1
+			},
+			{
+				markerSize: 0,
+				type: "line",
+				dataPoints: d_2
+			},
+			{
+				markerSize: 0,
+				type: "line",
+				dataPoints: d_3
+			}
+			]
+		});
+		// number of dataPoints visible at any point
+		var dataLength = 50;
+	</script>
+
+	<!-- Script to handle socket and also to update chart datapoints -->
+	<script>
+		var index = 0;
+		var socket = io();
+		socket.on('message', function(msg){
+			console.log(msg);
+			document.getElementById("message_disp").innerHTML = msg;
+			// Update data array
+			var output0;
+			var output1;
+			var output2;
+			var output3;
+			var i;
+			for (i = 0;i < 100;i++)
+			{
+				if (msg[i] == 'L')
+				{
+					output0 = msg.substring(i+2, i+6);
+				}
+				else if (msg[i] == 'U')
+				{
+					output1 = msg.substring(i+2, i+6);
+				}
+				else if (msg[i] == 'I')
+				{
+					output2 = msg.substring(i+2, i+6);
+				}
+				else if (msg[i] == 'W')
+				{
+					output3 = msg.substring(i+2, i+6);
+				}
+			}
+			var num0 = Number(output0);
+			var num1 = Number(output1);
+			var num2 = Number(output2);
+			var num3 = Number(output3);
+
+			d_0.push({
+				x: index,
+				y: num0
+			});
+			d_1.push({
+				x: index,
+				y: num1
+			});
+			d_2.push({
+				x: index,
+				y: num2
+			});
+			d_3.push({
+				x: index,
+				y: num3
+			});
+			index++;
+			if (d_0.length > dataLength) {
+				d_0.shift();
+			}
+			if (d_1.length > dataLength) {
+				d_1.shift();
+			}
+			if (d_2.length > dataLength) {
+				d_2.shift();
+			}
+			if (d_3.length > dataLength) {
+				d_3.shift();
+			}
+			chart.render();
+		});
+	</script>
+
+</body>
+
+</html>

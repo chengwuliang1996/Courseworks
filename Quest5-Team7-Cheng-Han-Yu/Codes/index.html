@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Quest 5</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td{
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        table.client_DB{
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        table.instant_status{
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        th{
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            color:black;
+        }
+
+        th.hi{
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            color:black;
+        }
+
+        td.hii{
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            color:black;
+        }
+
+        tr:hover {background-color:whitesmoke;}
+
+        div.container_1{
+            padding-top: 80px;
+            width:1000px;
+            margin: auto;
+        }
+
+        div.container_2{
+            padding-top: 150px;
+            width:800px;
+            margin: auto;
+            padding-bottom: 150px;
+
+        }
+
+        div.header{
+            padding-top: 50px;
+            margin: auto;
+            text-align: center;
+        }
+
+        h1{
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+            <h1>Welcome to EC444 Security Hub !</h1>
+    </div>
+    <div id="message_disp"></div>
+    <div class="container_1"> 
+    <table style="width:100%" class="instant_status" id="myTable">
+        <tr>
+            <th>Login Time</th>
+            <th>Client Name</th> 
+            <th>Fobs ID</th>
+            <th>CheckIn Status</th>
+          </tr>
+
+    </table>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <div class="container_2">
+        <table style="width:100%" class="client_DB">
+                <tr>
+                    <th class="hi">Client Name</th> 
+                    <th class="hi">Fobs ID</th>
+                    <th class="hi">CheckIn Status</th>
+                    </tr>
+                    <!-- client row -->
+                <tr>
+                    <td>Kevin</td>
+                    <td><p>1</p></td>
+                    <td><p id="client_1_status">Not Checked</p></td>
+                    </tr>
+
+                <tr>
+                    <td>William</td>
+                    <td><p>2</p></td>
+                    <td><p id="client_2_status">Not Checked</p></td>
+                    </tr>
+            </table>
+
+    </div>
+
+<!-- socket part -->
+    <script>
+        // table parameters
+        var time_arr=[];
+        var name_arr=[];
+        var id_arr=[];
+        var status_arr=[];
+
+        // parsing parameters
+
+        var socket = io();
+        const date = new Date().toString();
+        var date_array = date.split(' ');
+        var new_date = date_array[4];
+        var time;
+        var status;
+        var id;
+        var name;
+
+        socket.on('message',function(msg){
+            time = Object.keys(msg);
+            status = msg[Object.keys(msg)][0].Status;
+            id = msg[Object.keys(msg)][0].id;
+            name = msg[Object.keys(msg)][0].Name;
+
+            var table = document.getElementById("myTable");
+
+            console.log(time);
+            console.log(status);
+            console.log(id);
+            console.log(name);
+
+            time_arr.push(time);
+            name_arr.push(name);
+            id_arr.push(id);
+            status_arr.push(status);
+
+            //parsing msg info to web server
+            
+            // add table rows and update data in the table cells
+            if (time_arr.length>=0){
+                var row = table.insertRow(1);
+                var cell_1 = row.insertCell(0); // time
+                var cell_2 = row.insertCell(1); // name
+                var cell_3 = row.insertCell(2); // forb_id
+                var cell_4 = row.insertCell(3); // status
+                cell_1.innerHTML = time;
+                cell_2.innerHTML = name;
+                cell_3.innerHTML = id;
+                cell_4.innerHTML = status;
+            }
+            var i;
+            for (i=0; i<name_arr.length; i++){
+                if (name_arr[i] === 'William'){
+                    document.getElementById("client_2_status").innerHTML = 'Checked';
+                }
+                else if (name_arr[i] === 'Kevin'){
+                    document.getElementById("client_1_status").innerHTML = 'Checked';
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>
